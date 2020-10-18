@@ -1,0 +1,14 @@
+# @format
+
+AuctionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+        # self:provider.stage 資料來源於 *.yml 的 provider 中的 stage
+        TableName: AuctionsTable-${self:provider.stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+            - AttributeName: id
+              AttributeType: S
+        KeySchema:
+            - AttributeName: id
+              KeyType: HASH

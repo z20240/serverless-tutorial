@@ -1,0 +1,44 @@
+# @format
+
+service:
+    name: auction-service
+
+plugins:
+    - serverless-bundle
+    - serverless-pseudo-parameters
+
+provider:
+    name: aws
+    runtime: nodejs12.x
+    memorySize: 256
+    # 可以在 cmd-line 中使用 --stage=XXX 來帶入 stage 的 value; opt 是關鍵字
+    stage: ${opt:stage, 'dev'}
+    region: ap-northeast-1
+    environment:
+        AUCTIONS_TABLE_NAME: ${self:custom.AuctionsTable.name}
+    iamRoleStatements:
+        # 使用 file(路徑名稱):name 引入需要的 yml
+        - ${file(iam/AuctionsTableIAM.yml):AuctionsTableIAM}
+
+resources:
+    Resources:
+        # 使用 file(路徑名稱):name 引入需要的 yml
+        AuctionsTable: ${file(resources/AuctionsTable.yml):AuctionsTable}
+
+functions:
+    createAuction:
+        handler: src/handlers/createAuction.handler
+        events:
+            - http:
+                  method: POST
+                  path: /auction
+
+# 自己定義參數
+custom:
+    AuctionsTable:
+        # 使用 !Ref 獲得 return value name
+        name: !Ref AuctionsTable
+        # 使用 fn:GetAtt 獲得 Arn
+        arn: !GetAtt AuctionsTable.Arn
+    bundle:
+        lint: false

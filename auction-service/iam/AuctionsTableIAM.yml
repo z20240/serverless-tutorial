@@ -1,0 +1,11 @@
+# @format
+# 設定 IAM 的權限，使得 dynamodb 可以寫入
+AuctionsTableIAM:
+    Effect: Allow
+    Action:
+        - dynamodb:PutItem
+    Resource:
+        # arn 可以在 dynamodb 的資訊中查詢到
+        # - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/AuctionsTable
+        # 優化：直接用 custom 中定義 !arn 來獲得 aws 返回的 arn
+        - ${self:custom.AuctionsTable.arn}
